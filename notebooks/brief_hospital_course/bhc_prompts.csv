@@ -1,0 +1,31 @@
+﻿prompt_name,prompt
+bhc_prompt_zero_shot,"___ is a {age} year old {sex} presenting to the ED with {{chief_complaints}}. The patient visited the following wards in order: {{wards}}. Over the course of their hospital stay, ___ was given a set of diagnoses, radiology reports from consulting physicians, and a set of daily SOAP notes. Please use these SOAP notes to create a brief hospital course summary. Refer to the patient by three underscores (___). The structure of the brief hospital course summary should be:
+
+""""""
+[patient introduction including age, sex, chief complaints, and relevant past medical history]
+
+# Condition 1: medications, vitals, abnormal labs and cultures, and procedures pertinent to Condition 1
+# Condition 2: medications, vitals, abnormal labs and cultures, and procedures pertinent to Condition 2
+
+Conclusion
+""""""
+----------------------------------------------------------------
+
+"
+bhc_prompt_n_shot,"___ is a {age} year old {sex} presenting to the ED with {{chief_complaints}}. The patient visited the following wards in order: {{wards}}. Over the course of their hospital stay, ___ was given a set of diagnoses, radiology reports from consulting physicians, and a set of daily SOAP notes. Please use these SOAP notes to create a brief hospital course summary. Refer to the patient by three underscores (___). The structure of the brief hospital course summary should be:
+
+""""""
+[patient introduction including age, sex, chief complaints, and relevant past medical history]
+
+# Condition 1: medications, vitals, abnormal labs and cultures, and procedures pertinent to Condition 1
+# Condition 2: medications, vitals, abnormal labs and cultures, and procedures pertinent to Condition 2
+
+Conclusion
+""""""
+Please use the following brief hospital course as an example: 
+
+{{nshot}}
+----------------------------------------------------------------
+
+"
+bhc_system_message,"You are the discharging physician that is reviewing a patient's SOAP notes over their hospital course, starting in the ED and being discharged from your unit and writing a brief hospital course summary based on this information."
