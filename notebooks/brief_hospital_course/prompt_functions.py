@@ -172,8 +172,8 @@ def create_pt_prompt_per_day(discharge_row, prompts,
 
 
 def create_brief_hospital_course_prompts(discharge_row, soap_notes, prompts, 
-                                         edstays,                              
-                                         demos_in, triage_in, transfers_in, diags_in, procs_in, prescriptions_in, labs_in, microbio_in,
+                                         edstays, radiology, 
+                                         demos_in, triage_in, transfers_in, diags_in,
                                          shots=None):
     """
     Loop over the discharge instructions file in the challenge data. We include any additional examples we might want to include using the `shots` variable. 
@@ -201,7 +201,7 @@ def create_brief_hospital_course_prompts(discharge_row, soap_notes, prompts,
 
     pt_edstays = edstays[edstays['hadm_id'] == discharge_row['hadm_id']]
 
-    demos = get_demos(discharge_row['subject_id'])
+    demos = get_demos(discharge_row['subject_id'], demos_in)
     if demos.empty:
         age = r"[UNKNOWN AGE]"
         sex = r"[UNKNOWN SEX]"
@@ -212,35 +212,78 @@ def create_brief_hospital_course_prompts(discharge_row, soap_notes, prompts,
     ccs = []
     for stay_id in pt_edstays['stay_id'].tolist():
         # TODO: Drop in Triage Vitals/Pain Scale, etc. Currently only using CCs
-        triage_info = get_triage_info(stay_id)
+        triage_info = get_triage_info(stay_id, triage_in)
         ccs.append(triage_info['chiefcomplaint'].squeeze())
         
     chief_complaints = ", ".join(ccs)    
     
-    if sex:
-        pronoun = ["he","his"] if sex == "M" else ['she',"her"]
-    else:
-        pronoun = ["they", "their"]
-
-    transfers = get_transfers(discharge_row['hadm_id'])
+    transfers = get_transfers(discharge_row['hadm_id'], transfers_in)
     transfers = transfers[~transfers['careunit'].isna()]
     careunits = transfers['careunit'].tolist()
     
     # transfers with dates
-    tranfers = get_transfers(discharge_row['hadm_id'])
-    diags = get_diags(discharge_row['hadm_id'])
+    tranfers = get_transfers(discharge_row['hadm_id'], transfers_in)
+    diags = get_diags(discharge_row['hadm_id'], diags_in)
 
     # get GPT-created SOAP Notes
-    soap_notes = get_soap_notes(discharge_row['hadm_id'])
+    soap_notes = get_soap_notes(discharge_row['hadm_id'], soap_notes)
     # get radiology reports
-    radiology_reps = get_radiology_reports(discharge_row['hadm_id'])
-
+    radiology_reps = get_radiology_reports(discharge_row['hadm_id'], radiology)
     if shots:
-        prompt = f"___ is a {age} year old {sex} presenting to the ED with {chief_complaints}. Over the course of {pronoun[1]} hospital course, ___ started at {careunits[0]} and then visited {', '.join(careunits[1:])}. Over the course of their hospital stay, {pronoun[0]} was given the following diagnoses: {', '.join(diags['long_title'])} in order of importance to this admission.\n----------------------------------------------------The patient received the following radiology consult reports:{'----------------'.join(radiology_reps['text'].tolist())}.\n----------------------------------------------------Please use the following SOAP notes from the patient's complete hospital course to create a brief hospital course summary. Break down the hospital course summary by condition starting with a #: {'----------------'.join(soap_notes['gpt_SOAP_note'].tolist())}"
+        # age
+        # sex
+        # chief_complaints
+        # wards
+        # nshot
+        prompt = prompts.loc[prompts['prompt_name'] == "bhc_prompt_n_shot", "prompt"].squeeze()
+        prompt = prompt.replace(r"{{age}}", str(age))
+        prompt = prompt.replace(r"{{sex}}", sex)
+        prompt = prompt.replace(r"{{chief_complaints}}", chief_complaints)
+        prompt = prompt.replace(r"{{wards}}", ", ".join(careunits))
+
+        nshot_str = ""
+        for idx, shot in enumerate(shots):
+            nshot_str += f"Example {idx + 1}: {shot}"
+            nshot_str += "\n-------------\n"
         
+        prompt = prompt.replace(r"{{nshot}}", nshot_str)
+        # f"___ is a {age} year old {sex} presenting to the ED with {chief_complaints}. Over the course of {pronoun[1]} hospital course, ___ started at {careunits[0]} and then visited {', '.join(careunits[1:])}. Over the course of their hospital stay, {pronoun[0]} was given the following diagnoses: {', '.join(diags['long_title'])} in order of importance to this admission.\n----------------------------------------------------The patient received the following radiology consult reports:{'----------------'.join(radiology_reps['text'].tolist())}.\n----------------------------------------------------Please use the following SOAP notes from the patient's complete hospital course to create a brief hospital course summary. Break down the hospital course summary by condition starting with a #: {'----------------'.join(soap_notes['gpt_SOAP_note'].tolist())}"
     else:
         # only support one shot right now
-        prompt = f"___ is a {age} year old {sex} presenting to the ED with {chief_complaints}. Over the course of {pronoun[1]} hospital course, ___ started at {careunits[0]} and then visited {', '.join(careunits[1:])}. Over the course of their hospital stay, {pronoun[0]} was given the following diagnoses: {', '.join(diags['long_title'])} in order of importance to this admission.\n----------------------------------------------------The patient received the following radiology consult reports:{'----------------'.join(radiology_reps['text'].tolist())}.\n----------------------------------------------------Please use the following SOAP notes from the patient's complete hospital course to create a brief hospital course summary. Break down the hospital course summary by condition starting with a #: {'----------------'.join(soap_notes['gpt_SOAP_note'].tolist())} Use the following brief hospital course as an example: {shots[0]}"
+        prompt = prompts.loc[prompts['prompt_name'] == "bhc_prompt_zero_shot", "prompt"].squeeze()
+        prompt = prompt.replace(r"{{age}}", str(age))
+        prompt = prompt.replace(r"{{sex}}", sex)
+        prompt = prompt.replace(r"{{chief_complaints}}", chief_complaints)
+        prompt = prompt.replace(r"{{wards}}", ", ".join(careunits))        
+        # f"___ is a {age} year old {sex} presenting to the ED with {chief_complaints}. Over the course of {pronoun[1]} hospital course, ___ started at {careunits[0]} and then visited {', '.join(careunits[1:])}. Over the course of their hospital stay, {pronoun[0]} was given the following diagnoses: {', '.join(diags['long_title'])} in order of importance to this admission.\n----------------------------------------------------The patient received the following radiology consult reports:{'----------------'.join(radiology_reps['text'].tolist())}.\n----------------------------------------------------Please use the following SOAP notes from the patient's complete hospital course to create a brief hospital course summary. Break down the hospital course summary by condition starting with a #: {'----------------'.join(soap_notes['gpt_SOAP_note'].tolist())} Use the following brief hospital course as an example: {shots[0]}"
+    diags_str = "None" if diags.shape[0] == 0 else ', '.join(diags['long_title'].tolist()) 
+    
+    # radiology_reports_str = "None" if radiology_reps.shape[0] == 0 else '\n----------------\n'.join(radiology_reps['text'].tolist())
+
+    # create radiology reports string
+    radiology_reports_str = ""
+    if radiology_reps.shape[0] == 0:
+        radiology_reports_str = "None"
+    else:
+        for idx, radiology_report in enumerate(radiology_reps['text'].tolist()):
+            radiology_reports_str += f"Radiology Report #{idx + 1}: {radiology_report}"
+            radiology_reports_str += "\n-------------\n"
+    
+    # create SOAP NOTEs string
+    soap_notes_str = ""
+    if soap_notes.shape[0] == 0:
+        soap_notes_str = "None"
+    else:
+        for idx, soap_note in enumerate(soap_notes['gpt_SOAP_note'].tolist()):
+            soap_notes_str += f"SOAP NOTE #{idx + 1}: {soap_note}"
+            soap_notes_str += "\n-------------\n"
+    
+    prompt = (prompt + 
+             "\n\nDiagnoses (ordered by priority):\n----------------------------\n" + diags_str + 
+             "\n\nRadiology Reports:\n----------------------------\n" + radiology_reports_str + 
+             "\n\nDaily SOAP Notes:\n----------------------------\n" + soap_notes_str
+             )
+
     
     return prompt
     

@@ -118,10 +118,10 @@ def get_microbio_within_day(hadm_id, day_window):
     return adm_microbio
 
 # create initial input text prompt
-def get_soap_notes(hadm_id):
+def get_soap_notes(hadm_id, soap_notes):
     return soap_notes[soap_notes['hadm_id'] == hadm_id]
 
-def get_radiology_reports(hadm_id):
+def get_radiology_reports(hadm_id, radiology):
     adm_radiology = radiology[radiology['hadm_id'] == hadm_id]
     return adm_radiology.sort_values("note_seq")
 
