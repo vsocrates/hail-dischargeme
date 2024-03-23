@@ -431,3 +431,4 @@ Temporary Items
 *.csv
 
 !soap_note_prompts.csv
+!bhc_prompts.csv
