@@ -429,3 +429,5 @@ Temporary Items
 #
 *.html
 *.csv
+
+!soap_note_prompts.csv
