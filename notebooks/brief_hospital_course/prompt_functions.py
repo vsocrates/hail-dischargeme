@@ -81,9 +81,9 @@ def create_pt_prompt_per_service(discharge_row, prompts,
             
             full_prompt = init_prompt + within_service_prompt
             transfer_service_prompts.append(full_prompt)
-            care_units.append(row['careunit'])
-    
-    return transfer_service_prompts, care_units
+
+    transfers['service_prompts'] = transfer_service_prompts
+    return transfers
     
 
 
