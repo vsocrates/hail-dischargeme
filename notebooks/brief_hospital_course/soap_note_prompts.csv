@@ -1,4 +1,4 @@
-﻿prompt_name,prompt
+prompt_name,prompt
 SOAP_system_message,You are a physician that is reviewing a patient's medical record during their stay in your ward: ({ward}) and writing a SOAP Note based on this information.
 SOAP_header,"___ is a {{age}} year old {{sex}} that initially presented to the ED with {{chief_complaints}}. By the end of the hospital stay, ___ was given the following diagnoses in order of importance to this admission: {{adm_diags}}."
 SOAP_data,"A full list of the patient's procedures, medications, labs, and lab cultures is given below. Procedures are ordered by priority and medications are ordered chronologically. Given this information, please generate a SOAP progress note for this patient for their care during this part of their hospital course staying in the {{ward}} ward. Be SPECIFIC to the conditions, any abnormal labs, vitals, or procedures that were conducted, and significant medications as they relate to the hospital course: "

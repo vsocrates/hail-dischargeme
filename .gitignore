@@ -432,3 +432,6 @@ Temporary Items
 
 !soap_note_prompts.csv
 !bhc_prompts.csv
+
+notebooks/brief_hospital_course/template_code/wandb/
+notebooks/brief_hospital_course/template_code/mistral-dischargeme-finetune/

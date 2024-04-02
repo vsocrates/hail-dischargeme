@@ -53,7 +53,8 @@ def create_pt_prompt_per_service(discharge_row, prompts,
     init_prompt = init_prompt.replace(r"{{adm_diags}}", ', '.join(diags['long_title']))
     
     transfer_service_prompts = []
-
+    care_units = []
+    
     for index, row in transfers.iterrows():        
         if row['eventtype'] == "discharge":
              transfer_service_prompts.append("")
@@ -80,8 +81,9 @@ def create_pt_prompt_per_service(discharge_row, prompts,
             
             full_prompt = init_prompt + within_service_prompt
             transfer_service_prompts.append(full_prompt)
-    
-    return transfer_service_prompts
+
+    transfers['service_prompts'] = transfer_service_prompts
+    return transfers
     
 
 
