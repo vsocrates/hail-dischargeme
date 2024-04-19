@@ -10,7 +10,7 @@ from rouge import Rouge
 from bertscore import BertScore  #
 
 
-def calculate_scores(generated, reference, metrics):
+def calculate_scores_instructions(generated, reference, metrics):
     if not metrics:
         raise ValueError("No metrics specified for scoring.")
     print("Beginning scoring...")
@@ -87,7 +87,7 @@ def calculate_scores(generated, reference, metrics):
     return scores
 
 
-def compute_overall_score(scores):
+def compute_overall_score_instructions(scores):
     print("Computing overall score...")
     leaderboard = {}
 

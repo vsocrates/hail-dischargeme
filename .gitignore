@@ -436,3 +436,5 @@ Temporary Items
 notebooks/brief_hospital_course/template_code/wandb/
 notebooks/brief_hospital_course/template_code/mistral-dischargeme-finetune/
 notebooks/data_processing/simple_test.json
+
+*.out
