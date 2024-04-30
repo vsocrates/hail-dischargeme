@@ -29,3 +29,37 @@ Please use the following brief hospital course as an example:
 
 "
 bhc_system_message,"You are the discharging physician that is reviewing a patient's SOAP notes over their hospital course, starting in the ED and being discharged from your unit and writing a brief hospital course summary based on this information."
+bhc_gpt4_simple_medical,"Summarize the following patient hospital encounter into a brief hospital course. All brief hospital courses start with 1-2 sentences of introduction, describing why the patient arrived to the ED and any relevant features of the initial presentation. Break down the rest of the brief hospital course by condition. Include section headers for 'ACTIVE ISSUES:', 'CHRONIC ISSUES:', and 'TRANSITIONAL ISSUES:' where appropriate. MAKE SURE TO recede each condition with a #. For example, after the introduction, the first section might be '# Right SDH'. 
+                     
+Describe the course of events that the patient went through during their stay in sequential order, relating relevant labs, procedures, and medications to diagnoses of note found in the encounter information. The goal is to describe the clinical reasoning for various procedures, medications, imaging, and labs as you would to another physician on your care team. Organize your thoughts and then write the brief hospital course.
+
+Use these two brief hospital courses as examples:"
+bhc_gpt4_simple_surgical,"Summarize the following patient hospital encounter into a brief hospital course. All brief hospital courses start with 1-2 sentences of introduction, describing why the patient arrived to the ED and any relevant features of the initial presentation. Include section headers for 'CV', 'Pulmonary', 'GI/GU/FEN', 'ID' (stands for infectious disease), 'HEME' (stands for hematology), and 'Prophylaxis'. For example, after the introduction, the first section might be 'HEME: '. DO NOT include any sections that have no information within them. 
+
+Describe the course of events that the patient went through during their stay in sequential order, relating relevant labs, procedures, and medications to diagnoses of note found in the encounter information. The goal is to describe the clinical reasoning for various procedures, medications, imaging, and labs as you would to another physician on your care team. Organize your thoughts and then write the brief hospital course.
+
+Use these two brief hospital courses as examples:"
+bhc_gpt_service_intro,"Summarize the following patient hospital encounter into a brief hospital course. First think through the format below and and organize your thoughts. Then, write a brief hospital course. Your structure should follow the one below:"
+bhc_gpt4_CMED,"
+
+1. Begin with a title (pick one of the following options): BRIEF CLINICAL or HOSPITAL COURSE or PATIENT SUMMARY
+2. A brief 1-2 sentence introduction to the patient. Include their age, sex, and relevant past medical history and history of present illness (i.e. ___ y/o M with PMH...HPI)
+3. Include a section called ACUTE/ACTIVE ISSUES. Organize this section by problem/condition with a # (e.g. #ACS, #Right SDH)
+4. Next, include a section called CHRONIC ISSUES. Organize this section by problem/condition like the previous section.
+4. Next, include a section called TRANSITIONAL ISSUES. Organize this section by problem/condition with a [] (e.g. [] ACS, [] Right SDH)
+
+Use these two brief hospital courses as examples:"
+bhc_gpt4_CSURG,"
+
+1. Start with a 1-2 sentence introduction about the patient: Mr. ___ was admitted/transferred on ___ and underwent `procedure` (include relevant procedure name).
+2. Include 1-2 paragraphs of prose describing the reason for the procedure, how it went, and any relevant diagnosis, medications, labs, and microbiology cultures. Only include those relevant to the procedure of interest and keep it concise. Use medical abbreviations where necessary.
+3. End with a paragraph describing follow-up care: Discussed with Dr. ___, medicine was discontinued, followup with Dr. ___ in office as scheduled with further concerns. 
+
+Use these two brief hospital courses as examples:"
+bhc_gpt4_GU,"
+
+1. Begin with a sentence describing where the patient was admitted: Ms. ___ was admitted to `ward` with PMH of ___. Include past medical history only where necessary. 
+2. The include a new short paragraph with where the patient transferred from and why: Ms. ___ was admitted to the ___ (current service) service from the emergency department for ___ (conditions).
+3. Write a few paragraphs about the following hospital course, including procedures, blood thinners, medications, diet as well as commenting about any pain medications that may be relevant.
+
+Use these two brief hospital courses as examples:"
