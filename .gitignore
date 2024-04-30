@@ -450,3 +450,7 @@ notebooks/brief_hospital_course/outputs/
 ### ignore all the output checkpoints 
 notebooks/brief_hospital_course/template_code/bart-dischargeme-results_v2/
 notebooks/brief_hospital_course/template_code/old_files/
+notebooks/brief_hospital_course/BART_pipeline/bart-dischargeme-results_v1/
+
+# all weights and bias folders
+wandb/
