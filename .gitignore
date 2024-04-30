@@ -437,4 +437,16 @@ notebooks/brief_hospital_course/template_code/wandb/
 notebooks/brief_hospital_course/template_code/mistral-dischargeme-finetune/
 notebooks/data_processing/simple_test.json
 
+# slurm output files
 *.out
+
+# data run outputs for submission
+notebooks/brief_hospital_course/outputs/
+
+# ignore all output papermill files
+*_output.ipynb
+
+
+### ignore all the output checkpoints 
+notebooks/brief_hospital_course/template_code/bart-dischargeme-results_v2/
+notebooks/brief_hospital_course/template_code/old_files/
