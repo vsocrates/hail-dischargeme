@@ -26,12 +26,15 @@ def get_med_orders(hadm_id, med_orders):
 
 def get_prescriptions(hadm_id, prescriptions):
     adm_prescriptions = prescriptions[(prescriptions['hadm_id'] == hadm_id)]
+    return adm_prescriptions.sort_values("starttime")
     
 def get_labs(hadm_id, labs):
     adm_labs = labs[(labs['hadm_id'] == hadm_id)]
+    return adm_labs
 
 def get_microbio(hadm_id, microbio):
     adm_microbio = microbio[(microbio['hadm_id'] == hadm_id)]
+    return adm_microbio
 
 
 def get_med_orders_within_service(hadm_id, transfer_event, med_orders):
@@ -126,3 +129,65 @@ def get_radiology_reports(hadm_id, radiology):
     return adm_radiology.sort_values("note_seq")
 
 
+
+def inject_subheading_info(document, subheadings, dataframe_info):
+    # Split the document into lines
+    lines = document.split("\n")
+    
+    # Initialize variables to build the new document
+    found_subheading = False
+    
+    # Iterate through each line to find the subheading
+    for i in range(len(lines) - 1):
+        current_line = lines[i].strip()
+        
+        # Iterate through all the possible variants in the subheadings list
+        for subheading in subheadings:
+            # Check if the current line is the subheading
+            if current_line == subheading:
+                found_subheading = True
+                return document
+
+    # Check if subheading was never found, add it at the end if needed
+    if not found_subheading:
+        document = document + "\n" + subheadings[0]
+        document = document + "\n" + dataframe_info
+
+    # Join all lines to form the new document
+    return document
+
+
+
+def data_injection(hadm_id, document, data):
+    '''
+    Currently Implemented Subheadings:
+    age	sex	cc	diags	procs	prescriptions	labs	microbio
+    1. cc - Chief Complaint:
+    2. procs - Major Surgical or Invasive Procedure:
+    3. labs - Pertinent Results:/LABS ON ADMISSION:/ADMISSION LABS/LABS ON DISCHARGE:
+    4. microbio - MICRO:/URINE CULTURE/GRAM STAIN/FLUID CULTURE/ANAEROBIC CULTURE/NO MICROORGANISMS SEEN./Microbiology:
+    5. diags - this is not well structured, usually pretext and the preceding text always includes a one-liner in first part of HPI
+    6. radiology - Imaging:/"CT ____(specific)"/CXR
+    7. prescriptions seem to never be mentioned in preceding text?
+    '''
+    
+    #Making sure there is injection data available for specific hadm_id
+    if not (df_data['hadm_id'] == hadm_id).empty:
+        
+        #grabbing the information from the specific hadm_id
+        row = data.loc[data['hadm_id'] == hadm_id]
+        
+        for i in df_example.index:
+            cc = ["Chief Complaint:"]
+            procs = ["Major Surgical or Invasive Procedure:"]
+            labs = ["Pertinent Results:", "LABS ON ADMISSION:", "ADMISSION LABS", "LABS ON DISCHARGE:"]
+            microbio = ["MICRO:", "URINE CULTURE", "GRAM STAIN", "FLUID CULTURE", "ANAEROBIC CULTURE", "NO MICROORGANISMS SEEN.", "Microbiology:"]
+
+            #Injecting Chief Complaint
+            document = inject_subheading_info(document, cc, row.loc[0]["cc"])
+            document = inject_subheading_info(document, procs, row.loc[0]["procs"])
+            document = inject_subheading_info(document, labs, row.loc[0]["labs"])
+            document = inject_subheading_info(document, microbio, row.loc[0]["microbio"])
+    else:
+        print("No data available for injection.")
+    return document

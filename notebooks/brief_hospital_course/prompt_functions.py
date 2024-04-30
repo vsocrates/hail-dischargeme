@@ -288,4 +288,120 @@ def create_brief_hospital_course_prompts(discharge_row, soap_notes, prompts,
 
     
     return prompt
+
+
+def get_replacement_data(discharges, edstays, 
+                         demos_in, triage_in, 
+                         transfers_in, diags_in, 
+                         procs_in, prescriptions_in, 
+                         labs_in, microbio_in):
+    '''For each discharge, we grab all relevant information and make it a string-type list. 
+    '''
+    demos_out = []
+    diags_out = []
+    procs_out = []
+    prescriptions_out = []
+    labs_out = []
+    microbio_out = []
     
+    for row_idx, discharge in discharges.iterrows(): 
+
+        if row_idx % 100 == 0:
+            print(row_idx)
+            
+        demos = get_demos(discharge['subject_id'], demos_in)
+        if demos.empty:
+            age = r"[UNKNOWN AGE]"
+            sex = r"[UNKNOWN SEX]"
+        else:
+            age = demos['anchor_age']
+            sex = demos['gender']
+    
+        pt_edstays = edstays[edstays['hadm_id'] == discharge['hadm_id']]
+
+        ccs = []
+        for stay_id in pt_edstays['stay_id'].tolist():
+            triage_info = get_triage_info(stay_id, triage_in)
+            ccs.append(triage_info['chiefcomplaint'].squeeze())
+            
+        chief_complaints = ", ".join(ccs)
+    
+        # # transfers with dates
+        # transfers = get_transfers(discharge['hadm_id'], transfers_in)
+    
+        # get stay admission diagnoses
+        diags = get_diags(discharge['hadm_id'], diags_in)
+            
+        procs = get_procs(discharge['hadm_id'], procs_in)
+        # med_orders = get_med_orders_within_service(discharge['hadm_id'])
+        prescriptions = get_prescriptions(discharge['hadm_id'], prescriptions_in)
+        labs = get_labs(discharge['hadm_id'], labs_in)
+        microbio = get_microbio(discharge['hadm_id'], microbio_in)
+
+        age_str = f"Age:\n{age}\n\n"
+        sex_str = f"Sex:\n{sex}\n\n"
+        cc_str = f"Chief Complaints:\n{chief_complaints}\n\n"
+        
+        demos_out.append({
+            "age":age_str,
+            "sex":sex_str,
+            "cc":cc_str
+        })
+
+        # procs_str = ['None'] if procs.shape[0] == 0 else ', '.join(procs['long_title'].tolist()) 
+        # prescriptions_str = "None" if prescriptions.shape[0] == 0 else ', '.join(prescriptions['text'].tolist())
+        # labs_str = "None" if labs.shape[0] == 0 else ', '.join(labs['text'].tolist())
+        # microbio_str = "None" if microbio.shape[0] == 0 else ', '.join(microbio['text'].tolist())
+
+    
+        diags_str = f"Admission Diagnoses (ordered by importance):\n{'\n'.join(['None'] if diags.shape[0] == 0 else diags['long_title'])}\n\n"
+        diags_out.append({
+            "diags":diags_str
+        })
+
+        procs_str = f"Procedures (ordered by priority):\n{'\n'.join(['None'] if procs.shape[0] == 0 else procs['long_title'])}\n\n"
+        procs_out.append({
+            "procs":procs_str
+        })
+
+        prescriptions_str = f"Medications (ordered chronologically):\n{'\n'.join(['None'] if prescriptions.shape[0] == 0 else prescriptions['text'].tolist())}\n\n"
+        prescriptions_out.append({
+            "prescriptions": prescriptions_str
+        })
+        
+        labs_str = f"Labs:\n{'\n'.join(['None'] if labs.shape[0] == 0 else labs['text'].tolist())}\n\n"
+        labs_out.append({
+            "labs": labs_str
+        })
+
+        microbio_str = f"Microbiology Culture Results:\n{'\n'.join(['None'] if microbio.shape[0] == 0 else microbio['text'].tolist())}\n\n"
+        microbio_out.append({
+            "microbio": microbio_str
+        })
+
+    demos_df = pd.DataFrame.from_records(demos_out)
+    diags_df = pd.DataFrame.from_records(diags_out)
+    procs_df = pd.DataFrame.from_records(procs_out)
+    prescriptions_df = pd.DataFrame.from_records(prescriptions_out)
+    labs_df = pd.DataFrame.from_records(labs_out)
+    microbio_df = pd.DataFrame.from_records(microbio_out)
+
+    discharges_with_structured_data = pd.concat([discharges.reset_index(), demos_df, diags_df, procs_df, prescriptions_df, labs_df, microbio_df], axis=1)
+
+    return discharges_with_structured_data
+# within_service_prompt = (within_service_prompt + 
+#                          "\n\nProcedures (ordered by priority):\n----------------------------\n" + procs_str + 
+#                          "\n\nMedications (ordered chronologically):\n----------------------------\n" + prescriptions_str + 
+#                          "\n\nLabs:\n----------------------------\n" + labs_str + 
+#                          "\n\nMicrobio Cultures:\n----------------------------\n" + microbio_str )
+        
+
+# get_demos(subject_id, pts)
+# get_transfers(hadm_id, transfers)
+# get_triage_info(stay_id, triage)
+# get_procs(hadm_id, procs)
+# get_diags(hadm_id, diags)
+# get_med_orders(hadm_id, med_orders)
+# get_prescriptions(hadm_id, prescriptions)
+# get_labs(hadm_id, labs)
+# get_microbio(hadm_id, microbio)
