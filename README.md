@@ -19,3 +19,9 @@ The code includes a number of experiments outlined below:
 | Discharge Instructions | AIMI-Baseline                    | 0.0909          | 0.0119          | 0.1343           | 0.0335           | 0.0910           | 0.1026             | 0.0889          | 0.1622              | 0.1025          |
 |                        | GPT-3.5 (0-shot)                 | 0.2289          | 0.0299          | 0.3761           | 0.1312           | 0.2271           | 0.3047             | 0.3109          | 0.1821              | 0.2690          |
 |                        | BioBART                          | **0.3308** | **0.1458** | **0.4465**  | **0.1796**  | **0.2679**  | **0.4382**    | **0.3976** | **0.3527**     | **0.4183** |
+
+- Clinical-T5: https://www.physionet.org/content/clinical-t5/1.0.0/Clinical-T5-Large
+- BioBART: https://huggingface.co/GanjinZero/biobart-large
+- BioBART v2: https://huggingface.co/GanjinZero/biobart-v2-large
+- BioBART-Shuffled: _BioBART_ with the data reshuffled and including a larger training set
+- BioBART + Conditional Generation: _BioBART_ with Constrained generation to include key concepts in preceding text
